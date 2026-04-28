@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ProspectIQ — AI Sales Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020408;
+    --bg2: #030810;
+    --neon: #00d4ff;
+    --neon2: #0066ff;
+    --neon-soft: rgba(0,212,255,0.12);
+    --neon-border: rgba(0,212,255,0.25);
+    --white: #f0f8ff;
+    --muted: #5a7a8a;
+    --card: rgba(5,15,30,0.85);
+    --accent: #ff6b35;
+    --green: #00ff88;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ─── GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  section, nav, footer { position: relative; z-index: 1; }
+
+  /* ─── SCAN LINE ─── */
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,212,255,0.15), transparent);
+    animation: scanDown 8s linear infinite;
+    pointer-events: none;
+    z-index: 999;
+  }
+  @keyframes scanDown {
+    0%   { top: -2px; opacity: 1; }
+    95%  { opacity: 0.3; }
+    100% { top: 100vh; opacity: 0; }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 5%;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(2,4,8,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--neon-border);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .logo span { color: var(--neon); }
+
+  .nav-desktop {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .nav-links-desktop {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links-desktop a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links-desktop a:hover { color: var(--neon); }
+  .nav-login {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(240,248,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-login:hover { color: var(--white); }
+  .nav-cta {
+    background: transparent;
+    border: 1px solid var(--neon);
+    color: var(--neon);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-cta:hover { background: var(--neon); color: var(--bg); }
+
+  /* ─── HAMBURGER ─── */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+    z-index: 200;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--neon);
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── MOBILE DRAWER ─── */
+  .nav-drawer {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(2,4,8,0.98);
+    backdrop-filter: blur(24px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    z-index: 150;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    list-style: none;
+  }
+  .nav-drawer.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .nav-drawer a, .nav-drawer button {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .nav-drawer a:hover, .nav-drawer button:hover { color: var(--neon); }
+  .drawer-login {
+    color: rgba(240,248,255,0.4) !important;
+    font-size: 0.9rem !important;
+  }
+  .drawer-cta {
+    background: var(--neon) !important;
+    color: var(--bg) !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.06em !important;
+    padding: 14px 40px !important;
+    margin-top: 8px;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary {
+    background: var(--neon);
+    color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    padding: 16px 32px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    white-space: nowrap;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .btn-primary:hover::before { transform: translateX(100%); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,212,255,0.5); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    padding: 16px 28px;
+    border: 1px solid rgba(240,248,255,0.2);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .btn-ghost:hover { border-color: var(--neon); color: var(--neon); }
+
+  /* ─── SECTION COMMON ─── */
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+  .section-sub {
+    color: rgba(240,248,255,0.5);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 5% 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(800px, 100%);
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(0,102,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--neon-border);
+    background: var(--neon-soft);
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 32px;
+    animation: fadeDown 0.8s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .hero-headline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.8rem, 8vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.9s 0.1s ease both;
+  }
+  .hero-headline .line-neon { color: var(--neon); }
+  .hero-headline .line-dim { color: rgba(240,248,255,0.35); }
+
+  .hero-sub {
+    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+    color: rgba(240,248,255,0.55);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeUp 0.9s 0.3s ease both;
+    width: 100%;
+  }
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 64px;
+    animation: fadeUp 0.9s 0.4s ease both;
+    border-top: 1px solid var(--neon-border);
+    padding-top: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.2rem);
+    color: var(--neon);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ─── TERMINAL MOCKUP ─── */
+  .terminal-wrap {
+    margin-top: 72px;
+    width: 100%;
+    max-width: 900px;
+    border: 1px solid var(--neon-border);
+    background: rgba(0,5,15,0.9);
+    animation: fadeUp 0.9s 0.5s ease both;
+    box-shadow: 0 0 60px rgba(0,102,255,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--neon-border);
+    background: rgba(0,212,255,0.04);
+  }
+  .t-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .t-red { background: #ff5f56; }
+  .t-yellow { background: #febc2e; }
+  .t-green { background: #27c840; }
+  .t-title {
+    flex: 1;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .terminal-body {
+    padding: 24px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(0.65rem, 1.8vw, 0.8rem);
+    line-height: 2;
+    color: rgba(240,248,255,0.7);
+    text-align: left;
+    overflow-x: auto;
+  }
+  .t-cmd { color: var(--neon); }
+  .t-green-text { color: var(--green); }
+  .t-orange { color: var(--accent); }
+  .t-dim { color: var(--muted); }
+  .t-cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--neon);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* ─── FEATURES ─── */
+  #features {
+    padding: clamp(60px, 10vw, 120px) 5%;
+  }
+  .features-header {
+    margin-bottom: 60px;
+  }
+  .audience-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .audience-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--neon);
+    background: rgba(0,212,255,0.07);
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--neon-border);
+    border: 1px solid var(--neon-border);
+  }
+  .feature-card {
+    background: var(--bg);
+    padding: 36px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { background: rgba(0,212,255,0.04); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border: 1px solid var(--neon-border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    background: var(--neon-soft);
+  }
+  .feature-num {
+    position: absolute;
+    top: 20px; right: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(0,212,255,0.2);
+    letter-spacing: 0.1em;
+  }
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .feature-desc {
+    font-size: 0.85rem;
+    color: rgba(240,248,255,0.5);
+    line-height: 1.7;
+  }
+  .feature-tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--neon);
+    border: 1px solid var(--neon-border);
+    padding: 3px 10px;
+    background: var(--neon-soft);
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  #how {
+    padding: clamp(60px, 10vw, 120px) 5%;
+    background: linear-gradient(180deg, transparent, rgba(0,30,60,0.3), transparent);
+  }
+  .how-header { margin-bottom: 72px; }
+  .steps-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .steps-connector {
+    position: absolute;
+    top: 32px;
+    left: 16.6%;
+    right: 16.6%;
+    height: 1px;
+    background: linear-gradient(90deg, var(--neon), rgba(0,212,255,0.2), var(--neon));
+    z-index: 0;
+  }
+  .step {
+    padding: 0 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-num {
+    width: 64px; height: 64px;
+    border: 1px solid var(--neon);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--neon);
+    background: var(--bg);
+    margin-bottom: 32px;
+    box-shadow: 0 0 20px rgba(0,212,255,0.2);
+    position: relative;
+  }
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+  .step-desc {
+    font-size: 0.9rem;
+    color: rgba(240,248,255,0.5);
+    line-height: 1.7;
+  }
+  .step-detail {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-left: 2px solid var(--neon-border);
+    background: var(--neon-soft);
+  }
+  .step-detail p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--neon);
+    line-height: 1.8;
+  }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials {
+    padding: clamp(60px, 10vw, 120px) 5%;
+  }
+  .testimonials-header { margin-bottom: 64px; }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .testi-card {
+    border: 1px solid var(--neon-border);
+    padding: 32px 28px;
+    background: var(--card);
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .testi-card:hover { border-color: rgba(0,212,255,0.5); transform: translateY(-4px); }
+  .testi-quote {
+    font-size: 1.8rem;
+    color: var(--neon);
+    font-family: 'Syne', sans-serif;
+    line-height: 1;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  .testi-text {
+    font-size: 0.9rem;
+    color: rgba(240,248,255,0.7);
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+  .testi-author {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .testi-avatar {
+    width: 40px; height: 40px;
+    border: 1px solid var(--neon-border);
+    background: var(--neon-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--neon);
+    flex-shrink: 0;
+  }
+  .testi-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+  }
+  .testi-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+  }
+  .testi-stars {
+    position: absolute;
+    top: 24px; right: 24px;
+    color: #febc2e;
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+  }
+
+  /* ─── FAQ ─── */
+  #faq {
+    padding: clamp(60px, 10vw, 120px) 5%;
+    background: linear-gradient(180deg, transparent, rgba(0,20,50,0.3), transparent);
+  }
+  .faq-header { margin-bottom: 64px; }
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--neon-border);
+    border: 1px solid var(--neon-border);
+    max-width: 900px;
+  }
+  .faq-item {
+    padding: 28px 32px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .faq-item:hover { background: rgba(0,212,255,0.03); }
+  .faq-q {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.93rem;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .faq-q span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--neon);
+    flex-shrink: 0;
+  }
+  .faq-a {
+    font-size: 0.84rem;
+    color: rgba(240,248,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* ─── FINAL CTA ─── */
+  #cta {
+    padding: clamp(80px, 12vw, 140px) 5%;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #cta::before {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(900px, 100%);
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(0,102,255,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neon);
+    margin-bottom: 24px;
+  }
+  .cta-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 4.5rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .cta-title em {
+    font-style: normal;
+    color: var(--neon);
+    text-shadow: 0 0 40px rgba(0,212,255,0.4);
+  }
+  .cta-sub {
+    font-size: 1rem;
+    color: rgba(240,248,255,0.5);
+    max-width: 440px;
+    margin: 0 auto 48px;
+    line-height: 1.7;
+  }
+  .cta-form {
+    display: flex;
+    gap: 0;
+    max-width: 440px;
+    margin: 0 auto 20px;
+    width: 100%;
+  }
+  .cta-input {
+    flex: 1;
+    min-width: 0;
+    background: rgba(0,212,255,0.05);
+    border: 1px solid var(--neon-border);
+    border-right: none;
+    padding: 14px 18px;
+    color: var(--white);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .cta-input:focus { border-color: var(--neon); }
+  .cta-input::placeholder { color: var(--muted); }
+  .cta-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .cta-note span { color: var(--green); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--neon-border);
+    padding: 40px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-logo span { color: var(--neon); }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    flex-wrap: wrap;
+  }
+  .footer-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--neon); }
+  .footer-copy {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(90,122,138,0.5);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ═══════════════════════════════════════════
+     RESPONSIVE BREAKPOINTS
+  ═══════════════════════════════════════════ */
+
+  /* ── Tablet landscape / small desktop (≤1024px) ── */
+  @media (max-width: 1024px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .testi-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps-container { grid-template-columns: 1fr; gap: 48px; }
+    .steps-connector { display: none; }
+    .step { padding: 0; }
+    .step-num { margin-bottom: 24px; }
+  }
+
+  /* ── Tablet portrait (≤768px) ── */
+  @media (max-width: 768px) {
+    /* Nav */
+    .nav-desktop { display: none; }
+    .hamburger { display: flex; }
+
+    /* Hero */
+    #hero { padding: 100px 5% 64px; }
+    .hero-badge { font-size: 0.62rem; padding: 5px 12px; }
+    .hero-stats { gap: 20px; margin-top: 48px; padding-top: 32px; }
+    .stat-item { min-width: 80px; }
+
+    /* Terminal — simplified on mobile */
+    .terminal-body { font-size: 0.65rem; padding: 16px 18px; line-height: 1.9; }
+
+    /* Features */
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card { padding: 28px 24px; }
+
+    /* How */
+    .how-header { margin-bottom: 48px; }
+    .steps-container { gap: 40px; }
+
+    /* Testimonials */
+    .testi-grid { grid-template-columns: 1fr; }
+
+    /* FAQ */
+    .faq-grid { grid-template-columns: 1fr; max-width: 100%; }
+
+    /* CTA form stacks */
+    .cta-form { flex-direction: column; gap: 10px; }
+    .cta-input { border-right: 1px solid var(--neon-border); }
+    .cta-form .btn-primary { clip-path: none; }
+
+    /* Footer */
+    footer { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .footer-links { gap: 16px; }
+  }
+
+  /* ── Mobile (≤480px) ── */
+  @media (max-width: 480px) {
+    nav { padding: 14px 4%; }
+    .logo { font-size: 1.15rem; }
+
+    #hero { padding: 88px 4% 56px; }
+    .hero-headline { font-size: clamp(2.4rem, 11vw, 3.2rem); }
+    .hero-sub { font-size: 0.95rem; }
+    .hero-actions { flex-direction: column; align-items: stretch; }
+    .hero-actions .btn-primary,
+    .hero-actions .btn-ghost { text-align: center; }
+    .hero-stats { gap: 16px; }
+    .stat-num { font-size: 1.6rem; }
+
+    #features, #how, #testimonials, #faq, #cta { padding: 56px 4%; }
+
+    .section-title { font-size: clamp(1.6rem, 7vw, 2.2rem); }
+
+    .feature-card { padding: 24px 20px; }
+    .testi-card { padding: 24px 20px; }
+    .faq-item { padding: 20px 20px; }
+
+    .terminal-wrap { display: none; }
+
+    footer { padding: 32px 4%; }
+    .footer-links { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="url(#logoGrad)"/>
+      <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="15" fill="white" letter-spacing="-0.5">IQ</text>
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#3b82f6"/>
+          <stop offset="100%" stop-color="#1d4ed8"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    Prospect<span>IQ</span>
+  </div>
+
+  <!-- Desktop nav -->
+  <div class="nav-desktop">
+    <ul class="nav-links-desktop">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a href="https://prospectiq-kappa-ten.vercel.app" target="_blank" class="nav-login">Login →</a>
+    <button class="nav-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Request Access</button>
+  </div>
+
+  <!-- Hamburger -->
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<ul class="nav-drawer" id="navDrawer">
+  <li><a href="#features" onclick="closeMenu()">Features</a></li>
+  <li><a href="#how" onclick="closeMenu()">How It Works</a></li>
+  <li><a href="#testimonials" onclick="closeMenu()">Reviews</a></li>
+  <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
+  <li><a href="https://prospectiq-kappa-ten.vercel.app" target="_blank" class="drawer-login" onclick="closeMenu()">Login →</a></li>
+  <li><button class="drawer-cta" onclick="closeMenu();document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Request Access</button></li>
+</ul>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge">
+    <div class="badge-dot"></div>
+    Now in Early Access — Limited Seats Available
+  </div>
+
+  <h1 class="hero-headline">
+    <div>Find. Score.</div>
+    <div class="line-neon">Close Faster.</div>
+    <div class="line-dim">Sell Smarter.</div>
+  </h1>
+
+  <p class="hero-sub">
+    ProspectIQ is an AI-powered sales intelligence platform built for <strong style="color:var(--white)">web designers, SEO agencies, cold callers, and any sales pro</strong> who needs to find, qualify, and close local businesses — faster.
+  </p>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">
+      Request Early Access →
+    </button>
+    <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+      See How It Works
+    </button>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">80+</div>
+      <div class="stat-label">Leads Per Search</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3s</div>
+      <div class="stat-label">Avg. Score Time</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">AI</div>
+      <div class="stat-label">Pitch Generation</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Warm Outreach</div>
+    </div>
+  </div>
+
+  <div class="terminal-wrap reveal">
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div>
+      <div class="t-dot t-yellow"></div>
+      <div class="t-dot t-green"></div>
+      <span class="t-title">prospectiq — lead-scanner v2.4.1</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-cmd">$</span> prospectiq scan <span class="t-orange">--niche="roofing" --city="Austin, TX" --filter="no-website"</span></div>
+      <div class="t-dim">  → Connecting to Google Places API...</div>
+      <div class="t-dim">  → Running AI qualification engine...</div>
+      <div class="t-dim">  → Checking storm activity via WeatherAPI...</div>
+      <div><span class="t-green-text">  ✓ 94 leads found</span> — <span class="t-orange">31 VERY HOT</span> · <span style="color:#febc2e">28 HOT</span> · 35 Warm</div>
+      <div><span class="t-cmd">$</span> prospectiq pitch <span class="t-orange">--lead="Austin Roofing Co." --mode="storm-urgency"</span></div>
+      <div class="t-green-text">  ✓ AI pitch generated — storm activity detected in ZIP 78701</div>
+      <div><span class="t-cmd">$</span> <span class="t-cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="features-header reveal">
+    <div class="section-label">// Core Capabilities</div>
+    <h2 class="section-title">Everything your sales team needs.<br>Nothing they don't.</h2>
+    <p class="section-sub">Built for web designers, SEO specialists, cold callers, appointment setters, and any closer selling to local businesses.</p>
+    <div class="audience-tags">
+      <span class="audience-tag">🖥 Web Designers</span>
+      <span class="audience-tag">🔎 SEO Agencies</span>
+      <span class="audience-tag">📞 Cold Callers</span>
+      <span class="audience-tag">📅 Appointment Setters</span>
+      <span class="audience-tag">🏠 Local Service Sales</span>
+      <span class="audience-tag">🏢 SaaS Agencies</span>
+    </div>
+  </div>
+
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <span class="feature-num">01</span>
+      <div class="feature-icon">🔥</div>
+      <div class="feature-title">Hot Lead Scoring</div>
+      <p class="feature-desc">Every lead is scored and labeled automatically — <span style="color:#ff4444;font-weight:600">🔥 Very Hot</span>, <span style="color:#ff8c00;font-weight:600">🔥 Hot</span>, <span style="color:#febc2e;font-weight:600">⚠ Warm</span>, or <span style="color:var(--muted);font-weight:600">❄ Cold</span> — based on 12+ real signals. Know who to call first before you even dial.</p>
+      <span class="feature-tag">Live AI Scoring</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">02</span>
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">Difficulty Rating</div>
+      <p class="feature-desc">Each lead comes with a sales difficulty rating — <span style="color:#3b82f6;font-weight:600">Hard Close</span>, <span style="color:#22c55e;font-weight:600">Medium Close</span>, or <span style="color:var(--green);font-weight:600">Easy Close</span> — plus an AI explanation of exactly why. No more blind cold calls.</p>
+      <span class="feature-tag">Close Predictor</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">03</span>
+      <div class="feature-icon">🤖</div>
+      <div class="feature-title">AI Pitch Generator</div>
+      <p class="feature-desc">Generate a hyper-personalized opening pitch per lead in one click. Web designers get a free mockup angle. SEO agencies get a ranking gap pitch. Roofers get storm urgency hooks.</p>
+      <span class="feature-tag">Powered by Claude AI</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">04</span>
+      <div class="feature-icon">🔍</div>
+      <div class="feature-title">Smart Lead Search</div>
+      <p class="feature-desc">Pull 80–100+ targeted leads in seconds from Google Places. Filter by niche, city, rating, website status, and more — no spreadsheets, no manual scraping, no guesswork.</p>
+      <span class="feature-tag">Google Places API</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">05</span>
+      <div class="feature-icon">📋</div>
+      <div class="feature-title">Built-in CRM + Export</div>
+      <p class="feature-desc">Accept leads into your CRM with one click. Track status across lists, filter by niche, add notes, and export everything to Excel. Your full pipeline — organized and ready to work.</p>
+      <span class="feature-tag">CRM + Excel Export</span>
+    </div>
+    <div class="feature-card">
+      <span class="feature-num">06</span>
+      <div class="feature-icon">🎓</div>
+      <div class="feature-title">Sales Academy</div>
+      <p class="feature-desc">Train your team inside the platform. Scripts, objection handling, AI roleplay modules, and niche-specific playbooks — so every agent calls with confidence from day one.</p>
+      <span class="feature-tag">AI Roleplay</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="how-header reveal">
+    <div class="section-label">// How It Works</div>
+    <h2 class="section-title">From search to close<br>in three steps.</h2>
+    <p class="section-sub">No complex setup. No bloated dashboards. Just leads, scores, and pitches — ready to dial.</p>
+  </div>
+
+  <div class="steps-container reveal">
+    <div class="steps-connector"></div>
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Search Your Niche</div>
+      <p class="step-desc">Enter any city, niche, and filters. ProspectIQ pulls real business data from Google Places in seconds — ratings, phone numbers, addresses, website status, and more.</p>
+      <div class="step-detail">
+        <p>→ Roofing, Landscaping, Plumbing<br>→ Any U.S. or Canadian city<br>→ 80–100+ results per search</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">AI Qualifies & Scores</div>
+      <p class="step-desc">Our engine analyzes each lead across 12+ signals — no website, storm zone, review count, rating, response rate — and assigns a real-time quality score automatically.</p>
+      <div class="step-detail">
+        <p>→ Very Hot = dial immediately<br>→ Storm bonus = +40 urgency pts<br>→ No-website = instant priority</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Call With Context</div>
+      <p class="step-desc">Get an AI-generated pitch tailored to each lead before you dial. Know their pain points, urgency signals, and the perfect opening line — before they even pick up.</p>
+      <div class="step-detail">
+        <p>→ Personalized openers<br>→ Objection-ready talking points<br>→ Push to CRM or GHL</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testimonials-header reveal">
+    <div class="section-label">// Social Proof</div>
+    <h2 class="section-title">Teams that call smarter<br>close more deals.</h2>
+  </div>
+
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The difficulty rating is a game changer. I skip Hard Closes first thing in the morning and start with Medium and Easy. My conversion rate went up by 40% in the first week alone.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">MR</div>
+        <div>
+          <div class="testi-name">Marcus R.</div>
+          <div class="testi-role">Founder · Appointment Gen Agency</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">As a web designer I filter for "No Website" leads, hit AI Pitch, and I have a personalized mockup offer ready before I even dial. I closed 4 sites in my first week using ProspectIQ.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">ST</div>
+        <div>
+          <div class="testi-name">Sofia T.</div>
+          <div class="testi-role">Owner · Web Design Agency</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"</div>
+      <p class="testi-text">I use it for SEO prospecting. Filter businesses with "Website Issues", check the score, get the AI pitch with a ranking angle — and I'm having real conversations instead of chasing ghosts.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">JL</div>
+        <div>
+          <div class="testi-name">Jordan L.</div>
+          <div class="testi-role">SEO Specialist · Local Business Growth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="faq-header reveal">
+    <div class="section-label">// Frequently Asked</div>
+    <h2 class="section-title">Quick answers.</h2>
+  </div>
+
+  <div class="faq-grid reveal">
+    <div class="faq-item">
+      <div class="faq-q">Who is ProspectIQ built for? <span>+</span></div>
+      <p class="faq-a">Any sales professional targeting local businesses — web designers, SEO specialists, cold callers, appointment setters, roofing and landscaping sales, SaaS agencies, and more.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do I need technical skills to use it? <span>+</span></div>
+      <p class="faq-a">None. Type a city and niche, hit search, and you're done. ProspectIQ handles the data fetching, scoring, difficulty analysis, and pitch generation automatically.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What does the lead score mean? <span>+</span></div>
+      <p class="faq-a">Each lead is scored 0–100 based on 12+ signals: website status, Google rating, review count, storm activity, and more. Very Hot = dial now. Cold = skip or nurture later.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is the Difficulty Rating? <span>+</span></div>
+      <p class="faq-a">Every lead gets a predicted close difficulty — Hard, Medium, or Easy — with an AI explanation of why. It factors in competition, online presence, reviews, and engagement signals.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What's the pricing model? <span>+</span></div>
+      <p class="faq-a">Credits-based: $29 / $79 / $149 tiers. Monthly subscriptions at $39–$99/mo coming soon. White label available at $249/mo for agencies who want to resell.</p>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Does it integrate with my CRM or GHL? <span>+</span></div>
+      <p class="faq-a">GHL integration is in active development — push leads directly with a Pushed badge and timestamp. A full built-in CRM with Excel export is already live and ready to use.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="cta">
+  <p class="cta-eyebrow reveal">// Limited Early Access</p>
+  <h2 class="cta-title reveal">Your next <em>100 closes</em><br>start here.</h2>
+  <p class="cta-sub reveal">Join the early access list. Be first to dial smarter, close faster, and outwork every competitor still Googling for leads.</p>
+
+  <div class="cta-form reveal">
+    <input class="cta-input" type="email" placeholder="your@email.com" />
+    <button class="btn-primary">Request Access</button>
+  </div>
+  <p class="cta-note reveal"><span>✓ Free to join</span> &nbsp;·&nbsp; No credit card &nbsp;·&nbsp; Limited spots</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg width="26" height="26" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="url(#logoGrad2)"/>
+      <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="15" fill="white" letter-spacing="-0.5">IQ</text>
+      <defs>
+        <linearGradient id="logoGrad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#3b82f6"/>
+          <stop offset="100%" stop-color="#1d4ed8"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    Prospect<span>IQ</span>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#cta">Early Access</a></li>
+  </ul>
+  <p class="footer-copy">© 2025 ProspectIQ — AI Sales Intelligence</p>
+</footer>
+
+<script>
+  // Hamburger menu
+  function toggleMenu() {
+    const drawer = document.getElementById('navDrawer');
+    const burger = document.getElementById('hamburger');
+    drawer.classList.toggle('open');
+    burger.classList.toggle('open');
+    document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
+  }
+  function closeMenu() {
+    document.getElementById('navDrawer').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  // Close drawer when clicking outside
+  document.getElementById('navDrawer').addEventListener('click', function(e) {
+    if (e.target === this) closeMenu();
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Staggered feature cards
+  document.querySelectorAll('.feature-card').forEach((card, i) => {
+    card.style.transitionDelay = `${i * 60}ms`;
+  });
+</script>
+</body>
+</html>
