@@ -387,6 +387,39 @@
     margin-top: 6px;
   }
 
+  /* ─── NICHE TICKER ─── */
+  .niche-ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    margin: 32px 0 20px;
+    position: relative;
+    mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+  }
+  .niche-ticker {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: tickerScroll 40s linear infinite;
+  }
+  .niche-ticker:hover { animation-play-state: paused; }
+  .niche-ticker span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border: 1px solid rgba(0,212,255,0.25);
+    color: var(--neon);
+    background: rgba(0,212,255,0.06);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  @keyframes tickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
   /* ─── TERMINAL MOCKUP ─── */
   .terminal-wrap {
     margin-top: 72px;
@@ -926,6 +959,58 @@
     footer { padding: 32px 4%; }
     .footer-links { gap: 14px; }
   }
+  /* ─── ACCESS FORM ─── */
+  .access-form {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-full {
+    grid-column: 1 / -1;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-group label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-group input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(0,212,255,0.2);
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus {
+    border-color: var(--neon);
+    background: rgba(0,212,255,0.04);
+  }
+  .form-group input::placeholder { color: rgba(240,248,255,0.2); }
+  .form-submit {
+    width: 100%;
+    padding: 18px;
+    font-size: 1rem;
+    clip-path: none;
+  }
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -984,14 +1069,23 @@
   </div>
 
   <h1 class="hero-headline">
-    <div>Find. Score.</div>
-    <div class="line-neon">Close Faster.</div>
-    <div class="line-dim">Sell Smarter.</div>
+    <div>Millions of B2B Leads.</div>
+    <div class="line-neon">Any Niche. Any City.</div>
+    <div class="line-dim">Across All 50 States.</div>
   </h1>
 
   <p class="hero-sub">
-    Find high-intent businesses, uncover their biggest opportunities, and turn them into deals faster.
+    Search any niche in any U.S. city, get AI-scored leads instantly, generate personalized pitches, and push directly to GHL — all in one platform.
   </p>
+
+  <!-- NICHE TICKER -->
+  <div class="niche-ticker-wrap">
+    <div class="niche-ticker">
+      <span>Dentists</span><span>Roofers</span><span>Plumbers</span><span>Landscaping</span><span>HVAC</span><span>Restaurants</span><span>Gyms</span><span>Electricians</span><span>Law Firms</span><span>Real Estate Agents</span><span>Accountants</span><span>Chiropractors</span><span>Hair Salons</span><span>Auto Repair</span><span>Pest Control</span><span>Pool Service</span><span>Painters</span><span>General Contractors</span><span>Handyman</span><span>Cleaning Services</span><span>Insurance Agents</span><span>Financial Advisors</span><span>Veterinarians</span><span>Physical Therapy</span><span>Massage Therapy</span><span>Optometrists</span><span>Plastic Surgeons</span><span>Auto Detailing</span><span>Towing</span><span>Car Dealerships</span><span>Windshield Repair</span><span>Pizza Shops</span><span>Coffee Shops</span><span>Bakeries</span><span>Food Trucks</span><span>Caterers</span><span>Tutors</span><span>Photography Studios</span><span>Wedding Planners</span><span>Fence Installation</span><span>Garage Door Repair</span><span>Flooring</span><span>Concrete Contractors</span><span>Tree Service</span><span>Pressure Washing</span>
+      <!-- duplicate for seamless loop -->
+      <span>Dentists</span><span>Roofers</span><span>Plumbers</span><span>Landscaping</span><span>HVAC</span><span>Restaurants</span><span>Gyms</span><span>Electricians</span><span>Law Firms</span><span>Real Estate Agents</span><span>Accountants</span><span>Chiropractors</span><span>Hair Salons</span><span>Auto Repair</span><span>Pest Control</span><span>Pool Service</span><span>Painters</span><span>General Contractors</span><span>Handyman</span><span>Cleaning Services</span><span>Insurance Agents</span><span>Financial Advisors</span><span>Veterinarians</span><span>Physical Therapy</span><span>Massage Therapy</span><span>Optometrists</span><span>Plastic Surgeons</span><span>Auto Detailing</span><span>Towing</span><span>Car Dealerships</span><span>Windshield Repair</span><span>Pizza Shops</span><span>Coffee Shops</span><span>Bakeries</span><span>Food Trucks</span><span>Caterers</span><span>Tutors</span><span>Photography Studios</span><span>Wedding Planners</span><span>Fence Installation</span><span>Garage Door Repair</span><span>Flooring</span><span>Concrete Contractors</span><span>Tree Service</span><span>Pressure Washing</span>
+    </div>
+  </div>
 
   <div class="hero-actions">
     <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">
@@ -1003,7 +1097,7 @@
   </div>
 
   <p style="font-size: 0.85rem; color: var(--muted); margin-top: 20px; letter-spacing: 0.05em;">
-    <span style="color: var(--white); font-weight: 600;">Active Integration with GoHighLevel.</span> Works with HubSpot, Pipedrive, or any CRM that accepts Excel imports.
+    <span style="color: var(--green); font-weight: 600;">✓ GHL Push Live</span> &nbsp;·&nbsp; <span style="color: var(--white); font-weight: 600;">Works with any CRM via Excel export</span>
   </p>
 
   <div class="hero-stats">
@@ -1012,16 +1106,16 @@
       <div class="stat-label">Leads Per Search</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">3s</div>
-      <div class="stat-label">Avg. Score Time</div>
+      <div class="stat-num">50</div>
+      <div class="stat-label">U.S. States Covered</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">AI</div>
-      <div class="stat-label">Pitch Generation</div>
+      <div class="stat-num">45+</div>
+      <div class="stat-label">Niches Supported</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">100%</div>
-      <div class="stat-label">Warm Outreach</div>
+      <div class="stat-num">1-Click</div>
+      <div class="stat-label">GHL Push</div>
     </div>
   </div>
 
@@ -1048,9 +1142,9 @@
 <!-- FEATURES -->
 <section id="features">
   <div class="features-header reveal">
-    <div class="section-label">// How We Help</div>
-    <h2 class="section-title">Most businesses are leaving<br>money on the table.</h2>
-    <p class="section-sub">No website or outdated online presence. Strong reviews but no system to convert them into leads. Missing visibility and losing customers to competitors.</p>
+    <div class="section-label">// What You Get</div>
+    <h2 class="section-title">Everything you need<br>to fill your pipeline.</h2>
+    <p class="section-sub">Search any niche, any city, across all 50 U.S. states. ProspectIQ finds, scores, and pitches — you just close.</p>
   </div>
 
   <div class="who-section reveal" style="text-align: center; margin-bottom: 64px;">
@@ -1091,9 +1185,9 @@
     <div class="feature-card">
       <span class="feature-num">05</span>
       <div class="feature-icon">📋</div>
-      <div class="feature-title">Built-in CRM + Export</div>
-      <p class="feature-desc">Accept leads into your CRM with one click. Track status across lists, filter by niche, add notes, and export everything to Excel. Push leads directly to GHL — your full pipeline organized and ready to close.</p>
-      <span class="feature-tag">GHL + CRM + Excel</span>
+      <div class="feature-title">Built-in CRM + 1-Click GHL Push</div>
+      <p class="feature-desc">Save leads to your built-in CRM with one click. Filter by niche, track status, export to Excel — or push directly to GoHighLevel with a single click. Your full pipeline, organized and ready to close.</p>
+      <span class="feature-tag">✓ GHL Live · CRM · Excel</span>
     </div>
     <div class="feature-card">
       <span class="feature-num">06</span>
@@ -1110,33 +1204,33 @@
   <div class="how-header reveal">
     <div class="section-label">// How It Works</div>
     <h2 class="section-title">From search to close<br>in three steps.</h2>
-    <p class="section-sub">No complex setup. No bloated dashboards. Just leads, scores, and pitches — ready to dial.</p>
+    <p class="section-sub">No complex setup. No bloated dashboards. Just type a niche and a city — ProspectIQ does the rest.</p>
   </div>
 
   <div class="steps-container reveal">
     <div class="steps-connector"></div>
     <div class="step">
       <div class="step-num">01</div>
-      <div class="step-title">Find</div>
-      <p class="step-desc">Identify businesses with real problems and high buying intent.</p>
+      <div class="step-title">Search</div>
+      <p class="step-desc">Enter any business niche and location — city + state — and instantly pull 80–100+ real local businesses.</p>
       <div class="step-detail">
-        <p>→ 80–100+ leads in seconds<br>→ Real business data from Google Places<br>→ Niche + city filters</p>
+        <p>→ Any niche, any city across all 50 states<br>→ 80–100+ leads pulled in seconds<br>→ Real business data from Google Places</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">02</div>
-      <div class="step-title">Score</div>
-      <p class="step-desc">Analyze each lead and uncover the biggest revenue opportunity.</p>
+      <div class="step-title">AI Audit</div>
+      <p class="step-desc">Every lead is automatically scored and audited by AI — website quality, online presence, buying signals, and a full sales insight report.</p>
       <div class="step-detail">
-        <p>→ 12+ quality signals analyzed<br>→ High-intent leads flagged automatically<br>→ Real opportunity visible instantly</p>
+        <p>→ 12+ quality signals analyzed per lead<br>→ AI-generated sales pitch for each business<br>→ Easy / Medium / Hard close rating</p>
       </div>
     </div>
     <div class="step">
       <div class="step-num">03</div>
-      <div class="step-title">Close</div>
-      <p class="step-desc">Get a ready-to-use sales angle and take action immediately.</p>
+      <div class="step-title">Send & Close</div>
+      <p class="step-desc">Save your leads to your built-in CRM, push them to Go High Level with one click, or export to Excel — ready to dial.</p>
       <div class="step-detail">
-        <p>→ AI-generated pitch ready to dial<br>→ Know exactly what to say<br>→ Push to GHL, your CRM, or export to Excel</p>
+        <p>→ 1-click push to Go High Level<br>→ Built-in CRM to manage your pipeline<br>→ Export to Excel anytime</p>
       </div>
     </div>
   </div>
@@ -1216,7 +1310,7 @@
 
     <div class="faq-item">
       <div class="faq-q">Does it integrate with my CRM or GHL? <span>+</span></div>
-      <p class="faq-a">GHL integration is in active development — push leads directly with a Pushed badge and timestamp. A full built-in CRM with Excel export is already live and ready to use.</p>
+      <p class="faq-a">Yes — GHL integration is live. Push leads directly to GoHighLevel with one click, with automatic tags for niche, city, state, score, and website status. A full built-in CRM with Excel export is also available.</p>
     </div>
   </div>
 </section>
@@ -1225,13 +1319,42 @@
 <section id="cta">
   <p class="cta-eyebrow reveal">// Limited Early Access</p>
   <h2 class="cta-title reveal">Your next <em>100 closes</em><br>start here.</h2>
-  <p class="cta-sub reveal">Join the early access list. Be first to dial smarter, close faster, and outwork every competitor still Googling for leads.</p>
+  <p class="cta-sub reveal">Fill out the form below and we'll reach out to get you set up. Limited spots available.</p>
 
-  <div class="cta-form reveal">
-    <input class="cta-input" type="email" placeholder="your@email.com" />
-    <button class="btn-primary">Request Access</button>
+  <div class="access-form reveal">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="f-name" placeholder="John Smith" />
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="f-email" placeholder="john@agency.com" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="f-phone" placeholder="+1 214 555 0123" />
+      </div>
+      <div class="form-group">
+        <label>Your Niche *</label>
+        <input type="text" id="f-niche" placeholder="Roofing, Web Design, SEO..." />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group form-full">
+        <label>Agency / Business Name <span style="color:var(--muted)">(optional)</span></label>
+        <input type="text" id="f-agency" placeholder="Smith Sales Group" />
+      </div>
+    </div>
+    <p id="form-error" style="color:#ff4444;font-size:0.8rem;text-align:center;display:none;margin-bottom:8px;">Please fill in all required fields.</p>
+    <button class="btn-primary form-submit" onclick="submitToWhatsApp()">
+      Get Access →
+    </button>
+    <p class="cta-note" style="margin-top:16px;"><span>✓ No credit card</span> &nbsp;·&nbsp; <span>✓ Limited spots</span> &nbsp;·&nbsp; <span>✓ We'll reach out within 24hrs</span></p>
+    <p style="margin-top:12px;font-size:0.8rem;color:var(--muted);text-align:center;">Or email us at <a href="mailto:nazdah@gmail.com" style="color:var(--neon);text-decoration:none;">nazdah@gmail.com</a> for early access.</p>
   </div>
-  <p class="cta-note reveal"><span>✓ Free to join</span> &nbsp;·&nbsp; No credit card &nbsp;·&nbsp; Limited spots</p>
 </section>
 
 <!-- FOOTER -->
@@ -1259,6 +1382,34 @@
 </footer>
 
 <script>
+  // WhatsApp form submission
+  function submitToWhatsApp() {
+    const name = document.getElementById('f-name').value.trim()
+    const email = document.getElementById('f-email').value.trim()
+    const phone = document.getElementById('f-phone').value.trim()
+    const niche = document.getElementById('f-niche').value.trim()
+    const agency = document.getElementById('f-agency').value.trim()
+    const errorEl = document.getElementById('form-error')
+
+    if (!name || !email || !phone || !niche) {
+      errorEl.style.display = 'block'
+      return
+    }
+    errorEl.style.display = 'none'
+
+    const message = `🔥 *New Access Request - ProspectIQ*
+
+👤 *Name:* ${name}
+📧 *Email:* ${email}
+📱 *Phone:* ${phone}
+🎯 *Niche:* ${niche}${agency ? `\n🏢 *Agency:* ${agency}` : ''}
+
+_Sent from prospectiq-website.vercel.app_`
+
+    const encoded = encodeURIComponent(message)
+    window.open(`https://wa.me/50362176116?text=${encoded}`, '_blank')
+  }
+
   // Hamburger menu
   function toggleMenu() {
     const drawer = document.getElementById('navDrawer');
